@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lote;
+use App\Models\Muestra;
+
 use Illuminate\Http\Request;
 
 class MuestraController extends Controller
@@ -11,9 +14,16 @@ class MuestraController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $muestras = Muestra::select('muestras.*','municipios.nombre as municipio');
+        $muestras->join('municipios','muestras.municipio_id','=','municipios.id');
+
+        if($request->has('municipio_id')) { $muestras = $muestras->where('muestras.municipio_id','=',$request->municipio_id); }
+
+        $muestras = $muestras->where('muestras.enabled','=',1);
+        $muestras = $muestras->orderBy('muestras.municipio_id','asc')->get();
+        return $muestras;
     }
 
     /**
